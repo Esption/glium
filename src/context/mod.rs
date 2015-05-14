@@ -321,7 +321,10 @@ impl Context {
                                    where P: texture::PixelValue + Clone + Send,
                                    T: texture::Texture2dDataSink<Data = P>
     {
-        ops::read_from_default_fb(gl::FRONT_LEFT, &self)
+        let mut ctxt = self.make_current();
+        let dimensions = self.get_framebuffer_dimensions();
+        let rect = ::Rect { left: 0, bottom: 0, width: dimensions.0, height: dimensions.1 };
+        ops::read(&mut ctxt, ops::Source::DefaultFramebuffer(gl::FRONT_LEFT), &rect, &self)
     }
 
     /// Execute an arbitrary closure with the OpenGL context active. Useful if another
